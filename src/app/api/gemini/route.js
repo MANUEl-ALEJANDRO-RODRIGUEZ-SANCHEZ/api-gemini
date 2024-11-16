@@ -1,8 +1,28 @@
+import Cors from 'cors';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
+
+// Inicializa el middleware de CORS
+const cors = Cors({
+  methods: ['GET', 'POST', 'OPTIONS'], // Métodos permitidos
+  origin: 'http://127.0.0.1:5500',    // Permite solo este origen
+});
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
 
 const API_KEY = "AIzaSyCXee10egPvoClpNUEXRc-HzzcieiPpAPg";
 
 export const POST = async (req) => {
+  await runMiddleware(req, res, cors);
   try {
     // Procesa el JSON del cuerpo de la solicitud
     const { prompt } = await req.json();
